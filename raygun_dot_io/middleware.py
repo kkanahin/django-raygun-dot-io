@@ -63,6 +63,10 @@ class RaygunException(object):
         for k, v in headers:
             if not k.startswith('wsgi'):
                 _headers[k] = v
+        try:
+            raw_data = self.request.body if hasattr(self.request, 'body') else self.request.raw_post_data
+        except:
+            raw_data = ''
 
         return {
             'hostName': self.request.get_host(),
@@ -72,7 +76,7 @@ class RaygunException(object):
             'queryString': dict((key, self.request.GET[key]) for key in self.request.GET),
             'form': dict((key, self.request.POST[key]) for key in self.request.POST),
             'headers': _headers,
-            'rawData': self.request.body if hasattr(self.request, 'body') else self.request.raw_post_data
+            'rawData': raw_data
         }
 
     def _getClientData(self):
